@@ -1,24 +1,15 @@
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
 #include <iostream>
 #include <fstream>
-#include <algorithm>
 #include <vector>
 #include <cstdlib>
 #include <cstdint>
-#include <limits>
-#include <optional>
 #include <set>
 
 #include "vulkanexamplebase.h"
 #include "VulkanglTFModel.h"
 
-
-#include <cstdlib>
 #include <cstring>
 #include <cassert>
-#include <vector>
 #include <chrono>
 #include <map>
 #include <unordered_map>
@@ -26,7 +17,6 @@
 #include <vulkan/vulkan.h>
 #include "VulkanExampleBase.h"
 #include "VulkanTexture.hpp"
-#include "VulkanglTFModel.h"
 #include "VulkanUtils.hpp"
 #include "ui.hpp"
 
@@ -115,7 +105,7 @@ public:
 
     UI *ui;
 
-    const std::string assetpath = "./../data/";
+    const std::string assetpath = "./../models/";
 
     bool rotateModel = false;
     glm::vec3 modelrot = glm::vec3(0.0f);
@@ -308,10 +298,7 @@ public:
             renderNode(node, currentFrame, vkglTF::Material::ALPHAMODE_MASK);
         }
         // Transparent primitives
-        // TODO: Correct depth sorting
-        for (auto node: model.nodes) {
-            renderNode(node, currentFrame, vkglTF::Material::ALPHAMODE_BLEND);
-        }
+        for (auto node: model.nodes) renderNode(node, currentFrame, vkglTF::Material::ALPHAMODE_BLEND);
 
         // User interface
         ui->draw(currentCB);
@@ -341,8 +328,6 @@ public:
             shaderMaterial.alphaMask = static_cast<float>(material.alphaMode == vkglTF::Material::ALPHAMODE_MASK);
             shaderMaterial.alphaMaskCutoff = material.alphaCutoff;
             shaderMaterial.emissiveStrength = material.emissiveStrength;
-
-            // TODO: glTF specs states that metallic roughness should be preferred, even if specular glosiness is present
 
             if (material.pbrWorkflows.metallicRoughness) {
                 // Metallic roughness workflow
@@ -439,7 +424,7 @@ public:
 
         textures.empty.loadFromFile(assetpath + "textures/empty.ktx", VK_FORMAT_R8G8B8A8_UNORM, vulkanDevice, queue);
 
-        std::string sceneFile = assetpath + "models/DamagedHelmet/glTF-Embedded/DamagedHelmet.gltf";
+        std::string sceneFile = assetpath + "Models/DamagedHelmet/glTF-Embedded/DamagedHelmet.gltf";
         std::string envMapFile = assetpath + "environments/papermill.ktx";
         for (auto &arg: args) {
             if ((std::string(arg).find(".gltf") != std::string::npos) ||
@@ -629,8 +614,6 @@ public:
                         material.occlusionTexture ? material.occlusionTexture->descriptor : textures.empty.descriptor,
                         material.emissiveTexture ? material.emissiveTexture->descriptor : textures.empty.descriptor
                 };
-
-                // TODO: glTF specs states that metallic roughness should be preferred, even if specular glosiness is present
 
                 if (material.pbrWorkflows.metallicRoughness) {
                     if (material.baseColorTexture) {
